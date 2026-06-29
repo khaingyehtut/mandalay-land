@@ -45,7 +45,7 @@ export default function PlotSheet({ plot, phone, tel, onClose }) {
                     sizes="(max-width: 440px) 100vw, 440px"
                     style={{ objectFit: "cover" }}
                     priority={i === 0}
-                    quality={85}
+                    unoptimized
                   />
                 </div>
               ))}

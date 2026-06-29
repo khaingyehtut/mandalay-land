@@ -60,9 +60,8 @@ export default function CardGallery({ images, priority = false }) {
               fill
               sizes="(max-width: 440px) 100vw, 440px"
               style={{ objectFit: "cover" }}
-              // priority on first image of first card = LCP element gets preloaded
               priority={priority && i === 0}
-              quality={80}
+              unoptimized
               draggable={false}
             />
           </div>
