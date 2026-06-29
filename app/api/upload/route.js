@@ -22,7 +22,7 @@ export async function POST(req) {
 
   const ext = file.name.split(".").pop().toLowerCase();
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const dir = path.join(process.cwd(), "public", "uploads");
+  const dir = process.env.UPLOAD_DIR || path.join(process.cwd(), "public", "uploads");
 
   await mkdir(dir, { recursive: true });
   await writeFile(path.join(dir, filename), buffer);
