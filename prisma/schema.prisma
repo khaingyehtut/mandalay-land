@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid()) @map("_id")
+  name      String?
+  email     String   @unique
+  image     String?
+  password  String?
+  phone     String?
+  createdAt DateTime @default(now())
+  plots     Plot[]
+}
+
+model Setting {
+  key   String @id @map("_id")
+  value String @default("")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+}
+
+model Plot {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  township  String
+  street    String?
+  width     Int
+  height    Int
+  grant     String
+  priceLakh Int
+  facing    String?
+  road      String?
+  tag       String?
+  status    String   @default("available")
+  note      String?
+  images    String?
+  createdAt DateTime @default(now())
+}

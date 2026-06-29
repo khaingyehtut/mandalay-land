@@ -1,0 +1,31 @@
+import { NextResponse } from "next/server";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+
+export async function POST(req) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const formData = await req.formData();
+  const file = formData.get("file");
+  if (!file) return NextResponse.json({ error: "no file" }, { status: 400 });
+
+  const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+  if (!allowed.includes(file.type)) {
+    return NextResponse.json({ error: "jpg, png, webp သာ လက်ခံသည်" }, { status: 400 });
+  }
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  const ext = file.name.split(".").pop().toLowerCase();
+  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const dir = path.join(process.cwd(), "public", "uploads");
+
+  await mkdir(dir, { recursive: true });
+  await writeFile(path.join(dir, filename), buffer);
+
+  return NextResponse.json({ url: `/uploads/${filename}` });
+}
