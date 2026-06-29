@@ -16,6 +16,6 @@ export async function GET() {
   const plots = await prisma.plot.findMany({
     where: { userId: session.user.id },
     orderBy: { createdAt: "desc" },
-  });
+  }).catch(() => []);
   return NextResponse.json(plots.map(parsePlot));
 }

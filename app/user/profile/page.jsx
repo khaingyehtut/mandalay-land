@@ -19,7 +19,7 @@ export default async function UserProfilePage() {
   const dbUser = await prisma.user.findUnique({
     where: { email: user.email },
     select: { createdAt: true, password: true, _count: { select: { plots: true } } },
-  });
+  }).catch(() => null);
 
   const joinDate = dbUser?.createdAt
     ? new Date(dbUser.createdAt).toLocaleDateString("my-MM", { year: "numeric", month: "long", day: "numeric" })

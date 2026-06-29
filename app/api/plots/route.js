@@ -12,7 +12,7 @@ function parsePlot(p) {
 }
 
 export async function GET() {
-  const plots = await prisma.plot.findMany({ orderBy: { createdAt: "desc" } });
+  const plots = await prisma.plot.findMany({ orderBy: { createdAt: "desc" } }).catch(() => []);
   return NextResponse.json(plots.map(parsePlot));
 }
 
