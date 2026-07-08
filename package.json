@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "lsof -ti:3000 | xargs kill -9 2>/dev/null; rm -rf .next && next dev",
     "clean": "lsof -ti:3000 | xargs kill -9 2>/dev/null; rm -rf .next",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && next build && cp .env.production .next/standalone/.env.production",
+    "deploy": "npm run build && rsync -az --delete --exclude='public/uploads/' --exclude='start.sh' --exclude='.env' .next/standalone/ root@68.183.183.0:/var/www/mandalay-land/ && rsync -az --delete .next/static/ root@68.183.183.0:/var/www/mandalay-land/.next/static/ && ssh root@68.183.183.0 'cd /var/www/mandalay-land/.next/server && for f in chunks/*.js; do ln -sf \"$f\" \"$(basename $f)\" 2>/dev/null; done; printf \"#!/bin/bash\\nset -a\\nsource /var/www/mandalay-land/.env\\nset +a\\nexec node /var/www/mandalay-land/server.js\\n\" > /var/www/mandalay-land/start.sh && chmod +x /var/www/mandalay-land/start.sh; pm2 restart all --update-env'",
     "start": "next start",
     "postinstall": "prisma generate",
     "seed": "node prisma/seed.js",

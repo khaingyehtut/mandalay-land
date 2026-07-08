@@ -96,7 +96,7 @@ export default function ForgotPasswordPage() {
               <h2 style={{
                 fontSize: 18, fontWeight: 800, color: "#ECE6D9", margin: "0 0 8px",
                 fontFamily: "var(--font-myanmar, system-ui)",
-              }}>Email ပို့ပြီးပါပြီ</h2>
+              }}>အီးမေးလ် ပို့ပြီးပါပြီ</h2>
               <p style={{
                 fontSize: 13, color: "#6B7280", margin: "0 0 24px",
                 fontFamily: "var(--font-myanmar, system-ui)", lineHeight: 1.6,
@@ -126,7 +126,7 @@ export default function ForgotPasswordPage() {
                 <label style={{
                   display: "block", fontSize: 11, fontWeight: 700, color: "#6B7280",
                   letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 7,
-                }}>Email</label>
+                }}>အီးမေးလ်</label>
                 <input
                   className="auth-input"
                   type="email" required

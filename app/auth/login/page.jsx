@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { signIn } from "next-auth/react";
+import { useState, Suspense, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -41,9 +41,14 @@ function LoginForm() {
   const [submitting, setSubmitting] = useState(false);
   const [oauthLoading, setOauthLoading] = useState("");
   const router = useRouter();
+  const { status } = useSession();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/user/profile";
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const registered = searchParams.get("registered");
+
+  useEffect(() => {
+    if (status === "authenticated") router.replace("/");
+  }, [status, router]);
 
   async function handleOAuth(provider) {
     setOauthLoading(provider);
@@ -86,12 +91,13 @@ function LoginForm() {
       `}</style>
 
       <div style={{
-        minHeight: "100vh",
+        height: "100dvh",
+        overflowY: "auto",
         background: "#0C0D11",
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "center",
-        padding: "32px 16px",
+        padding: "40px 16px 60px",
       }}>
         <div style={{ width: "100%", maxWidth: 360, animation: "blurUp .45s cubic-bezier(0.16,1,0.3,1) both" }}>
 
@@ -171,7 +177,7 @@ function LoginForm() {
               <div style={{ marginBottom: 14, animation: "slideUp .4s .22s cubic-bezier(0.16,1,0.3,1) both" }}>
                 <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#6B7280",
                   letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 7 }}>
-                  Email
+                  အီးမေးလ်
                 </label>
                 <input className="auth-input" name="email" type="email" required
                   placeholder="you@example.com" autoComplete="email"
@@ -185,13 +191,13 @@ function LoginForm() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
                   <label style={{ fontSize: 11, fontWeight: 700, color: "#6B7280",
                     letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                    Password
+                    စကားဝှက်
                   </label>
                   <Link href="/auth/forgot-password" style={{
                     fontSize: 12, color: "#E0A33B", textDecoration: "none",
                     fontFamily: "var(--font-myanmar, system-ui)",
                   }}>
-                    Password မေ့နေသလား?
+                    စကားဝှက် မေ့နေသလား?
                   </Link>
                 </div>
                 <input className="auth-input" name="password" type="password" required
@@ -271,6 +277,7 @@ function LoginForm() {
           </p>
         </div>
       </div>
+
     </>
   );
 }

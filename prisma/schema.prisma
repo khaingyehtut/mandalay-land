@@ -44,8 +44,12 @@ model Plot {
   facing    String?
   road      String?
   tag       String?
-  status    String   @default("available")
-  note      String?
-  images    String?
-  createdAt DateTime @default(now())
+  listingType String   @default("sale")
+  status      String   @default("available")
+  note        String?
+  images      String?
+  viberToken  String?
+  agentName   String?
+  agentPhone  String?
+  createdAt   DateTime @default(now())
 }

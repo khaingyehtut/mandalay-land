@@ -155,8 +155,8 @@ export default function Listings({ plots, phone }) {
               </svg>
             </span>
             <div>
-              <b className="mm">မန္တလေး မြေကွက်</b>
-              <small>Land Survey · MDY</small>
+              <b>Mandalay Land</b>
+              <small className="mm">ကိုအောင် အိမ်ခြံမြေ နှင့် ဆောက်လုပ်ရေး</small>
             </div>
           </a>
           <span className="loc mm">
@@ -384,67 +384,6 @@ export default function Listings({ plots, phone }) {
         )}
       </main>
 
-      <nav>
-        <a
-          className={mode === "buy" ? "on" : ""}
-          onClick={() => setMode("buy")}
-          role="button"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          >
-            <path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z" />
-          </svg>
-          <span className="mm">မြေကွက်</span>
-        </a>
-        <a href={tel}>
-          <Phone />
-          <span className="mm">ဖုန်း</span>
-        </a>
-        <a
-          className="post"
-          onClick={() => setMode("sell")}
-          role="button"
-          aria-label="ရောင်းမယ်"
-        >
-          <span className="pc">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-            >
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </span>
-        </a>
-        <a href="/admin">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          >
-            <path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z" />
-          </svg>
-          <span className="mm">စီမံ</span>
-        </a>
-        <a href="/profile">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          >
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 21c0-4 4-6 8-6s8 2 8 6" />
-          </svg>
-          <span className="mm">ကျွန်ုပ်</span>
-        </a>
-      </nav>
 
       {sel && (
         <div className="sheet" role="dialog" aria-modal="true">

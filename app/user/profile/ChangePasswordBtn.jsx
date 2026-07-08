@@ -156,9 +156,9 @@ export default function ChangePasswordBtn() {
                 )}
 
                 {[
-                  { label: "လက်ရှိ Password", value: current, setter: setCurrent, complete: "current-password" },
-                  { label: "Password သစ်", value: next, setter: setNext, complete: "new-password" },
-                  { label: "Password သစ် အတည်ပြုမည်", value: confirm, setter: setConfirm, complete: "new-password" },
+                  { label: "လက်ရှိ စကားဝှက်", value: current, setter: setCurrent, complete: "current-password" },
+                  { label: "စကားဝှက် သစ်", value: next, setter: setNext, complete: "new-password" },
+                  { label: "စကားဝှက် သစ် အတည်ပြုမည်", value: confirm, setter: setConfirm, complete: "new-password" },
                 ].map(({ label, value, setter, complete }) => (
                   <div key={label} style={{ marginBottom: 14 }}>
                     <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#6B7280", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 7, fontFamily: "var(--font-myanmar, system-ui)" }}>

@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
 
 // Dynamically imported in ListingsContent — code-split from main bundle.
 // SSR: true (default) so the first image IS in the initial HTML for LCP.
@@ -54,14 +53,12 @@ export default function CardGallery({ images, priority = false }) {
         {images.map((img, i) => (
           // cg-slide: position:relative required for next/image fill
           <div key={i} className="cg-slide">
-            <Image
+            <img
               src={img}
               alt=""
-              fill
-              sizes="(max-width: 440px) 100vw, 440px"
-              style={{ objectFit: "cover" }}
-              priority={priority && i === 0}
-              unoptimized
+              style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover" }}
+              loading="eager"
+              fetchPriority={priority && i === 0 ? "high" : "auto"}
               draggable={false}
             />
           </div>

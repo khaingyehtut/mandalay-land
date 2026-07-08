@@ -1,5 +1,9 @@
 import { Space_Grotesk, Space_Mono, Noto_Sans_Myanmar, Padauk } from "next/font/google";
 import Providers from "@/components/Providers";
+import BottomNav from "@/components/BottomNav";
+import { Suspense } from "react";
+import FastClick from "@/components/FastClick";
+import NavProgress from "@/components/NavProgress";
 import "./globals.css";
 
 const grotesk = Space_Grotesk({
@@ -33,10 +37,13 @@ const padauk = Padauk({
 });
 
 export const metadata = {
-  title: "မန်းလေး မြေကွက် · Land Survey",
+  title: "ကိုအောင် အိမ်ခြံမြေနှင့်ဆောက်လုပ်ရေး",
   description: "မန္တလေးမြို့ မြေကွက် အရောင်းအဝယ် — ကြိုက်ရင် ဖုန်းတိုက်ရိုက်ခေါ်နိုင်သည်။",
+  other: {
+    "google": "notranslate",
+  },
   openGraph: {
-    title: "မန်းလေး မြေကွက် · Land Survey",
+    title: "ကိုအောင် အိမ်ခြံမြေနှင့်ဆောက်လုပ်ရေး",
     description: "မန္တလေးမြို့ မြေကွက် အရောင်းအဝယ်",
     type: "website",
     locale: "my_MM",
@@ -46,13 +53,15 @@ export const metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   themeColor: "#13151A",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="my" className={`${grotesk.variable} ${mono.variable} ${myanmar.variable} ${padauk.variable}`}>
-      <body><Providers>{children}</Providers></body>
+    <html lang="my" translate="no" className={`${grotesk.variable} ${mono.variable} ${myanmar.variable} ${padauk.variable}`}>
+      <body><Providers>{children}<BottomNav /><FastClick /><Suspense><NavProgress /></Suspense></Providers></body>
     </html>
   );
 }

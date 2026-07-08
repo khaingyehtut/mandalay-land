@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import PlotPlan from "@/components/PlotPlan";
 import { mmNum, mmPrice } from "@/lib/format";
@@ -26,12 +26,30 @@ export default function PlotSheet({ plot, phone, tel, onClose }) {
     setImgIdx(Math.round(scrollLeft / clientWidth));
   }
 
+  // Auto-slide every 3s when multiple images
+  useEffect(() => {
+    const imgs = plot.images ?? [];
+    if (imgs.length <= 1) return;
+    const id = setInterval(() => {
+      setImgIdx(prev => {
+        const next = (prev + 1) % imgs.length;
+        galleryRef.current?.scrollTo({ left: next * galleryRef.current.clientWidth, behavior: "smooth" });
+        return next;
+      });
+    }, 3000);
+    return () => clearInterval(id);
+  }, [plot.images]);
+
   return (
     <div className="sheet" role="dialog" aria-modal="true">
       <div className="bg" onClick={onClose} />
+      <button className="sheet-back" onClick={onClose} aria-label="ပြန်သွားမည်">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        <span className="mm">ပြန်</span>
+      </button>
       <div className="panel">
-        <div className="grab" />
-
         {plot.images?.length > 0 ? (
           <div className="dg-wrap">
             <div className="dg-scroll" ref={galleryRef} onScroll={handleGalleryScroll}>
@@ -68,12 +86,19 @@ export default function PlotSheet({ plot, phone, tel, onClose }) {
 
         <div className="dwrap">
           <h2 className="mm">{plot.township} မြေကွက်</h2>
-          <div className="subt mm">{plot.street ? plot.street + " · " : ""}{plot.grant}</div>
-          <div className="dprice">{mmPrice(plot.priceLakh)}</div>
+          <div className="subt mm">
+            {plot.street ? plot.street + (plot.listingType !== "rent" ? " · " : "") : ""}
+            {plot.listingType !== "rent" ? plot.grant : ""}
+          </div>
+          <div className="dprice">
+            {plot.listingType === "rent"
+              ? `${plot.priceLakh.toLocaleString()} ကျပ် /1လ`
+              : mmPrice(plot.priceLakh)}
+          </div>
           <div className="specs mm">
             <div><small>အကျယ်အဝန်း</small><b className="mono">{plot.width} × {plot.height} ပေ</b></div>
             <div><small>ဧရိယာ</small><b className="mono">{mmNum(plot.width * plot.height)} စတုရန်းပေ</b></div>
-            <div><small>ဂရန်အမျိုးအစား</small><b>{plot.grant}</b></div>
+            {plot.listingType !== "rent" && <div><small>ဂရန်အမျိုးအစား</small><b>{plot.grant}</b></div>}
             {plot.facing && <div><small>မျက်နာလည့်</small><b>{plot.facing}ဘက်</b></div>}
             {plot.road && <div><small>ရှေ့လမ်း</small><b>{plot.road}</b></div>}
             {plot.street && <div><small>တည်နေရာ</small><b>{plot.street}</b></div>}

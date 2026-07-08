@@ -1,14 +1,21 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getAuthUser } from "@/lib/mobileAuth";
 import { assertNoPhone } from "@/lib/phoneDetect";
 import { deleteUploadedImages } from "@/lib/deleteImages";
+import { notifyStatusChange } from "@/lib/viber";
 
 export const dynamic = "force-dynamic";
 
 function parsePlot(p) {
   return { ...p, images: JSON.parse(p.images || "[]") };
+}
+
+// Public base URL of the incoming request (real domain behind the proxy).
+function reqBaseUrl(req) {
+  const host  = req.headers.get("x-forwarded-host") || req.headers.get("host");
+  const proto = req.headers.get("x-forwarded-proto") || "https";
+  return host ? `${proto}://${host}` : "";
 }
 
 export async function GET(_req, { params }) {
@@ -18,12 +25,12 @@ export async function GET(_req, { params }) {
 }
 
 export async function PUT(req, { params }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const user = await getAuthUser(req);
+  if (!user?.id) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const existing = await prisma.plot.findUnique({ where: { id: params.id } });
   if (!existing) return NextResponse.json({ error: "not found" }, { status: 404 });
-  if (existing.userId !== session.user.id) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  if (existing.userId !== user.id) return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   const b = await req.json();
 
@@ -34,7 +41,7 @@ export async function PUT(req, { params }) {
   }
 
   const data = {};
-  for (const k of ["township", "street", "grant", "facing", "road", "tag", "status", "note"]) {
+  for (const k of ["township", "street", "grant", "facing", "road", "tag", "status", "note", "listingType", "agentName", "agentPhone"]) {
     if (b[k] !== undefined) data[k] = b[k] === "" ? null : b[k];
   }
   for (const k of ["width", "height", "priceLakh"]) {
@@ -43,17 +50,21 @@ export async function PUT(req, { params }) {
   if (b.images !== undefined) {
     data.images = JSON.stringify(Array.isArray(b.images) ? b.images : []);
   }
-  const plot = await prisma.plot.update({ where: { id: params.id }, data });
-  return NextResponse.json(parsePlot(plot));
+  const raw  = await prisma.plot.update({ where: { id: params.id }, data });
+  const plot = parsePlot(raw);
+  if (data.status && data.status !== existing.status && ["sold", "pending"].includes(data.status)) {
+    notifyStatusChange({ ...plot, viberToken: existing.viberToken }, data.status, reqBaseUrl(req)).catch(() => {});
+  }
+  return NextResponse.json(plot);
 }
 
-export async function DELETE(_req, { params }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+export async function DELETE(req, { params }) {
+  const user = await getAuthUser(req);
+  if (!user?.id) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const existing = await prisma.plot.findUnique({ where: { id: params.id } });
   if (!existing) return NextResponse.json({ error: "not found" }, { status: 404 });
-  if (existing.userId !== session.user.id) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  if (existing.userId !== user.id) return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   await deleteUploadedImages(existing.images);
   await prisma.plot.delete({ where: { id: params.id } });

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { signIn } from "next-auth/react";
+import { useState, Suspense, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useFormState, useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -96,11 +96,72 @@ function SubmitBtn() {
 function RegisterForm() {
   const [oauthLoading, setOauthLoading] = useState("");
   const router = useRouter();
+  const { status } = useSession();
   const [state, action] = useFormState(registerUser, {});
 
+  useEffect(() => {
+    if (status === "authenticated") router.replace("/");
+  }, [status, router]);
+
   if (state?.success) {
-    router.push("/auth/login?registered=true");
-    return null;
+    const viberUrl = process.env.NEXT_PUBLIC_VIBER_CHANNEL;
+    return (
+      <div style={{
+        height:"100dvh", overflowY:"auto", background:"#0C0D11",
+        display:"flex", alignItems:"center", justifyContent:"center",
+        padding:"40px 16px",
+      }}>
+        <div style={{ width:"100%", maxWidth:360, textAlign:"center", animation:"blurUp .45s cubic-bezier(0.16,1,0.3,1) both" }}>
+          <style>{`@keyframes blurUp{from{opacity:0;transform:translateY(24px);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}`}</style>
+
+          {/* Check icon */}
+          <div style={{
+            width:72, height:72, borderRadius:22, margin:"0 auto 20px",
+            background:"rgba(52,211,153,0.1)", border:"2px solid rgba(52,211,153,0.3)",
+            display:"flex", alignItems:"center", justifyContent:"center",
+          }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.5">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+          </div>
+
+          <h2 style={{ fontSize:22, fontWeight:800, color:"#ECE6D9", margin:"0 0 8px",
+            fontFamily:"var(--font-myanmar,system-ui)" }}>
+            အကောင့် ဖွင့်ပြီးပါပြီ
+          </h2>
+          <p style={{ fontSize:13, color:"#6B7280", margin:"0 0 28px",
+            fontFamily:"var(--font-myanmar,system-ui)" }}>
+            မြေကွက် သတင်းများ အမြန်ရရှိရန် Viber Channel သို့ ဝင်ပါ
+          </p>
+
+          {viberUrl && (
+            <a href={viberUrl} target="_blank" rel="noopener noreferrer"
+              style={{
+                display:"flex", alignItems:"center", justifyContent:"center", gap:10,
+                width:"100%", padding:"15px", borderRadius:14, marginBottom:12,
+                background:"linear-gradient(135deg,#665CAC,#8B7FD4)",
+                color:"#fff", fontSize:15, fontWeight:800, textDecoration:"none",
+                fontFamily:"var(--font-myanmar,system-ui)",
+                boxShadow:"0 6px 24px rgba(102,92,172,0.4)",
+              }}>
+              <svg width="22" height="22" viewBox="0 0 512 512" fill="#fff">
+                <path d="M444 49.9C431.3 38.2 379.9.9 265.3.4c0 0-135.1-8.1-200.9 52.3C27.8 89.3 14.9 143 13.5 209.5c-1.4 66.5-3.1 191.1 116.9 225.5h.1l-.1 51.6s-.8 20.9 13 25.1c16.6 5.2 26.4-10.7 42.3-27.8 8.7-9.4 20.7-23.2 29.8-33.7 82.2 6.9 145.3-8.9 152.5-11.2 16.6-5.4 110.5-17.4 125.7-142.1 15.8-128.6-7.6-209.8-49.7-246.8z"/>
+              </svg>
+              Viber Channel ဝင်မည်
+            </a>
+          )}
+
+          <button onClick={() => router.push("/")}
+            style={{
+              width:"100%", padding:"14px", borderRadius:14, border:"1px solid #2C313C",
+              background:"transparent", color:"#6B7280", fontSize:14, cursor:"pointer",
+              fontFamily:"var(--font-myanmar,system-ui)",
+            }}>
+            ကျော်သွားမည်
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -121,12 +182,13 @@ function RegisterForm() {
       `}</style>
 
       <div style={{
-        minHeight: "100vh",
+        height: "100dvh",
+        overflowY: "auto",
         background: "#0C0D11",
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "center",
-        padding: "32px 16px",
+        padding: "40px 16px 60px",
       }}>
         <div style={{ width: "100%", maxWidth: 360, animation: "blurUp .45s cubic-bezier(0.16,1,0.3,1) both" }}>
 
@@ -195,7 +257,7 @@ function RegisterForm() {
                   style={{ ...fieldStyle, fontFamily: "var(--font-myanmar, system-ui)" }}/>
               </div>
               <div style={{ marginBottom: 14, animation: "slideUp .4s .28s cubic-bezier(0.16,1,0.3,1) both" }}>
-                <label style={labelStyle}>Email</label>
+                <label style={labelStyle}>အီးမေးလ်</label>
                 <input className="auth-input" name="email" type="email" required
                   placeholder="you@example.com" autoComplete="email"
                   style={{ ...fieldStyle, fontFamily: "var(--font-grotesk, system-ui)" }}/>
@@ -207,12 +269,12 @@ function RegisterForm() {
                   style={{ ...fieldStyle, fontFamily: "var(--font-grotesk, system-ui)" }}/>
               </div>
               <div style={{ marginBottom: 20, animation: "slideUp .4s .4s cubic-bezier(0.16,1,0.3,1) both" }}>
-                <label style={labelStyle}>Password</label>
+                <label style={labelStyle}>စကားဝှက်</label>
                 <input className="auth-input" name="password" type="password" required minLength={6}
                   placeholder="အနည်းဆုံး ၆ လုံး" autoComplete="new-password"
                   style={{ ...fieldStyle, fontFamily: "var(--font-grotesk, system-ui)", letterSpacing: "0.1em" }}/>
                 <p style={{ fontSize: 12, color: "#4B5563", marginTop: 6, fontFamily: "var(--font-myanmar, system-ui)" }}>
-                  Password တွင် အနည်းဆုံး ၆ လုံး ထည့်ပါ
+                  စကားဝှက်တွင် အနည်းဆုံး ၆ လုံး ထည့်ပါ
                 </p>
               </div>
 
@@ -234,7 +296,7 @@ function RegisterForm() {
             {/* Social row */}
             <div style={{ display: "flex", gap: 10, animation: "slideUp .4s .58s cubic-bezier(0.16,1,0.3,1) both" }}>
               <button className="oauth-btn" disabled={!!oauthLoading}
-                onClick={async () => { setOauthLoading("google"); await signIn("google", { callbackUrl: "/user/profile" }); }}
+                onClick={async () => { setOauthLoading("google"); await signIn("google", { callbackUrl: "/" }); }}
                 style={{
                   flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
                   gap: 8, padding: "12px 10px", borderRadius: 12,
@@ -246,7 +308,7 @@ function RegisterForm() {
                 Google
               </button>
               <button className="oauth-btn" disabled={!!oauthLoading}
-                onClick={async () => { setOauthLoading("facebook"); await signIn("facebook", { callbackUrl: "/user/profile" }); }}
+                onClick={async () => { setOauthLoading("facebook"); await signIn("facebook", { callbackUrl: "/" }); }}
                 style={{
                   flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
                   gap: 8, padding: "12px 10px", borderRadius: 12,
@@ -275,6 +337,7 @@ function RegisterForm() {
           </p>
         </div>
       </div>
+
     </>
   );
 }

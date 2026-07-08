@@ -13,7 +13,7 @@ export default async function Home({ searchParams }) {
     getServerSession(authOptions),
     getSitePhone(),
   ]);
-  const town    = searchParams?.town || "";
+  const town = searchParams?.town || "";
   const isAdmin = session?.user?.email === process.env.ADMIN_EMAIL;
 
   return (

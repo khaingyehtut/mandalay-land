@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getAuthUser } from "@/lib/mobileAuth";
 
 export async function POST(req) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const user = await getAuthUser(req);
+  if (!user?.id) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const formData = await req.formData();
   const file = formData.get("file");

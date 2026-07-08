@@ -25,14 +25,14 @@ export default async function UserProfilePage() {
     ? new Date(dbUser.createdAt).toLocaleDateString("my-MM", { year: "numeric", month: "long", day: "numeric" })
     : null;
 
-  const provider = dbUser?.password ? "Email"
+  const provider = dbUser?.password ? "အီးမေးလ်"
     : user.image?.includes("googleusercontent") ? "Google"
     : user.image?.includes("facebook") || user.image?.includes("fbcdn") ? "Facebook"
     : "OAuth";
 
-  const providerBg = { Email: "#1E2232", Google: "rgba(66,133,244,0.12)", Facebook: "rgba(24,119,242,0.12)", OAuth: "#1E2232" }[provider];
-  const providerColor = { Email: "#888B95", Google: "#60a5fa", Facebook: "#818cf8", OAuth: "#888B95" }[provider];
-  const providerBorder = { Email: "#2C313C", Google: "rgba(96,165,250,0.3)", Facebook: "rgba(129,140,248,0.3)", OAuth: "#2C313C" }[provider];
+  const providerBg = { "အီးမေးလ်": "#1E2232", Google: "rgba(66,133,244,0.12)", Facebook: "rgba(24,119,242,0.12)", OAuth: "#1E2232" }[provider];
+  const providerColor = { "အီးမေးလ်": "#888B95", Google: "#60a5fa", Facebook: "#818cf8", OAuth: "#888B95" }[provider];
+  const providerBorder = { "အီးမေးလ်": "#2C313C", Google: "rgba(96,165,250,0.3)", Facebook: "rgba(129,140,248,0.3)", OAuth: "#2C313C" }[provider];
 
   const initials = user.name?.replace(/\s+/g, "").slice(0, 1).toUpperCase() ?? user.email?.[0]?.toUpperCase() ?? "U";
   const isAdmin = user.email === process.env.ADMIN_EMAIL;
@@ -45,7 +45,7 @@ export default async function UserProfilePage() {
     },
     {
       icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>,
-      label: "Email", value: user.email,
+      label: "အီးမေးလ်", value: user.email,
     },
     ...(joinDate ? [{
       icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>,
@@ -250,39 +250,6 @@ export default async function UserProfilePage() {
         <SignOutBtn />
       </main>
 
-      <nav>
-        <Link href="/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>
-          </svg>
-          <span className="mm">မြေကွက်</span>
-        </Link>
-        <Link href="/phone">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/>
-          </svg>
-          <span className="mm">ဖုန်း</span>
-        </Link>
-        <Link href="/admin" className="post" aria-label="ရောင်းမယ်">
-          <span className="pc">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <path d="M12 5v14M5 12h14"/>
-            </svg>
-          </span>
-        </Link>
-        <Link href="/admin">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/>
-          </svg>
-          <span className="mm">စီမံ</span>
-        </Link>
-        <Link href="/user/profile" className="on">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>
-          </svg>
-          <span className="mm">ကျွန်ုပ်</span>
-        </Link>
-      </nav>
     </div>
   );
 }

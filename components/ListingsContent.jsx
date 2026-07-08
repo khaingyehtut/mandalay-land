@@ -1,5 +1,6 @@
 "use client";
 import { useState, useMemo, useEffect, useTransition } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import PlotPlan from "@/components/PlotPlan";
@@ -7,7 +8,24 @@ import { mmNum } from "@/lib/format";
 
 // PlotSheet: not needed on initial paint — load its JS only when a card is tapped
 const CardGallery = dynamic(() => import("@/components/CardGallery"));
-const PlotSheet = dynamic(() => import("@/components/PlotSheet"), { ssr: false });
+const PlotSheet = dynamic(() => import("@/components/PlotSheet"), {
+  ssr: false,
+  loading: () => (
+    <div className="sheet" role="dialog">
+      <div className="bg" />
+      <div className="panel">
+        <div className="sk-plan" />
+        <div style={{ padding: "18px", display: "flex", flexDirection: "column", gap: 10 }}>
+          <div className="sk-line" style={{ width: "60%", height: 22 }} />
+          <div className="sk-line" style={{ width: "40%", height: 13, marginTop: 2 }} />
+          <div className="sk-line" style={{ width: "45%", height: 28, marginTop: 10 }} />
+          <div className="sk-line" style={{ width: "100%", height: 90, marginTop: 14, borderRadius: 12 }} />
+          <div className="sk-btn" style={{ marginTop: 8 }} />
+        </div>
+      </div>
+    </div>
+  ),
+});
 
 const Phone = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -17,25 +35,32 @@ const Phone = () => (
 
 export default function ListingsContent({ plots, phone, townships, activeTown, isAdmin }) {
   const [q, setQ] = useState("");
+  const [listingType, setListingType] = useState("sale");
   const [sel, setSel] = useState(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const tel = "tel:" + phone.replace(/[^0-9+]/g, "");
 
-  // Client-side search on already-fetched plots (instant, no network)
   const items = useMemo(
     () =>
       plots.filter(
         (p) =>
-          q.trim() === "" ||
-          (p.township + (p.street || "") + p.grant).toLowerCase().includes(q.trim().toLowerCase())
+          (p.listingType ?? "sale") === listingType &&
+          (q.trim() === "" ||
+            (p.township + (p.street || "") + p.grant).toLowerCase().includes(q.trim().toLowerCase()))
       ),
-    [plots, q]
+    [plots, q, listingType]
   );
 
   useEffect(() => {
-    document.body.style.overflow = sel ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    const app = document.querySelector(".app");
+    if (app) app.style.overflow = sel ? "hidden" : "";
+    if (sel) document.body.classList.add("sheet-open");
+    else document.body.classList.remove("sheet-open");
+    return () => {
+      if (app) app.style.overflow = "";
+      document.body.classList.remove("sheet-open");
+    };
   }, [sel]);
 
   useEffect(() => {
@@ -52,6 +77,12 @@ export default function ListingsContent({ plots, phone, townships, activeTown, i
 
   return (
     <>
+      {/* Sale / Rent tabs */}
+      <div className="seg mm" role="tablist" style={{ margin: "11px 18px 0" }}>
+        <button className={listingType === "sale" ? "on" : ""} onClick={() => setListingType("sale")}>ဝယ်မည်</button>
+        <button className={listingType === "rent" ? "on" : ""} onClick={() => setListingType("rent")}>ဌားမည်</button>
+      </div>
+
       {/* Search input */}
       <div className="search" style={{ margin: "11px 18px 0" }}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -104,17 +135,20 @@ export default function ListingsContent({ plots, phone, townships, activeTown, i
                 {p.images?.length > 0
                   ? <CardGallery images={p.images} priority={i === 0} />
                   : <PlotPlan w={p.width} h={p.height} />}
-                {p.status === "sold" && <div className="sold mm">ရောင်းပြီး</div>}
+                {p.status === "sold" && <div className="sold mm">{p.listingType === "rent" ? "ငှားပြီး" : "ရောင်းပြီး"}</div>}
               </div>
               <div className="info">
                 <div className="top">
                   <div className="twn mm">
                     {p.township}
-                    <span className="grant">{p.street ? p.street + " · " : ""}{p.grant}</span>
+                    <span className="grant">
+                      {p.street ? p.street + (p.listingType !== "rent" ? " · " : "") : ""}
+                      {p.listingType !== "rent" ? p.grant : ""}
+                    </span>
                   </div>
                   <div className="price">
-                    <b>{mmNum(p.priceLakh)}</b>
-                    <small className="mm">သိန်း</small>
+                    <b>{p.listingType === "rent" ? p.priceLakh.toLocaleString() : mmNum(p.priceLakh)}</b>
+                    <small className="mm">{p.listingType === "rent" ? "/1လ" : "သိန်း"}</small>
                   </div>
                 </div>
                 <div className="meta mm">
@@ -159,6 +193,35 @@ export default function ListingsContent({ plots, phone, townships, activeTown, i
                     </span>
                   </div>
                 )}
+                {isAdmin && (p.agentName || p.agentPhone) && (
+                  <div style={{
+                    display:"flex", alignItems:"center", gap:6,
+                    marginTop:6, padding:"5px 8px",
+                    background:"rgba(99,179,237,0.07)",
+                    border:"1px solid rgba(99,179,237,0.18)",
+                    borderRadius:8,
+                  }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                      stroke="#63B3ED" strokeWidth="2">
+                      <circle cx="12" cy="8" r="4"/>
+                      <path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>
+                    </svg>
+                    {p.agentName && (
+                      <span style={{ fontSize:11, color:"#63B3ED", fontFamily:"var(--font-myanmar,system-ui)",
+                        fontWeight:600, flex:1, minWidth:0,
+                        overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                        {p.agentName}
+                      </span>
+                    )}
+                    {p.agentPhone && (
+                      <>
+                        <span style={{ fontSize:10, color:"rgba(99,179,237,0.4)" }}>·</span>
+                        <span style={{ fontSize:11, color:"#63B3ED", fontVariantNumeric:"tabular-nums",
+                          letterSpacing:"0.02em" }}>{p.agentPhone}</span>
+                      </>
+                    )}
+                  </div>
+                )}
                 {isAdmin && p.user && (
                   <div style={{
                     display:"flex", alignItems:"center", gap:6,
@@ -195,12 +258,14 @@ export default function ListingsContent({ plots, phone, townships, activeTown, i
         </div>
       ) : (
         <p className="mm" style={{ textAlign: "center", color: "var(--muted)", padding: "40px 0" }}>
-          မြေကွက် မရှိသေးပါ။ တခြားမြို့နယ် ရွေးကြည့်ပါ။
+          {listingType === "rent" ? "အဌားချမည့် မြေကွက် မရှိသေးပါ။" : "မြေကွက် မရှိသေးပါ။ တခြားမြို့နယ် ရွေးကြည့်ပါ။"}
         </p>
       )}
 
-      {/* PlotSheet JS loads only after first card tap — ssr:false keeps it out of initial HTML */}
-      {sel && <PlotSheet plot={sel} phone={phone} tel={tel} onClose={() => setSel(null)} />}
+      {sel && createPortal(
+        <PlotSheet plot={sel} phone={phone} tel={tel} onClose={() => setSel(null)} />,
+        document.body
+      )}
     </>
   );
 }

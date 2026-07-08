@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ssh root@68.183.183.0 \"ls /var/www/mandalay-land/public/ 2>/dev/null && echo '---' && ls /var/www/mandalay-land/public/uploads/ 2>/dev/null | head -5 && echo '---' && curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/uploads/ 2>/dev/null\")"
+    ]
+  }
+}

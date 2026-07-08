@@ -150,7 +150,7 @@ function PlotsTable({ plots }) {
 function getProvider(u) {
   if (u.image?.includes("googleusercontent")) return { label: "Google", color: "#60a5fa", bg: "rgba(96,165,250,0.12)", border: "rgba(96,165,250,0.3)" };
   if (u.image?.includes("facebook") || u.image?.includes("fbcdn")) return { label: "Facebook", color: "#818cf8", bg: "rgba(129,140,248,0.12)", border: "rgba(129,140,248,0.3)" };
-  return { label: "Email", color: "#888B95", bg: "#1E2232", border: "#2C313C" };
+  return { label: "အီးမေးလ်", color: "#888B95", bg: "#1E2232", border: "#2C313C" };
 }
 
 function UserDetailSheet({ user, userPlots, adminEmail, onClose, onDeleted }) {
@@ -238,7 +238,7 @@ function UserDetailSheet({ user, userPlots, adminEmail, onClose, onDeleted }) {
           {[
             {
               icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>,
-              label: "Email", value: user.email,
+              label: "အီးမေးလ်", value: user.email,
             },
             ...(user.phone ? [{
               icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg>,
